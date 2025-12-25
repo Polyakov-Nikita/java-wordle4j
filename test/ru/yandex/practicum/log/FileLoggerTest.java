@@ -3,6 +3,7 @@ package ru.yandex.practicum.log;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.exceptions.CustomIOException;
 import ru.yandex.practicum.log.exceptions.LogFileNotFoundException;
 
 import java.io.*;
@@ -33,13 +34,17 @@ public class FileLoggerTest implements Loggable {
     }
 
     @BeforeAll
-    public static void createLog() throws IOException {
+    public static void createLog() {
         FILE_LOGGER.create();
     }
 
     @AfterAll
-    public static void deleteLog() throws IOException {
-        Files.deleteIfExists(LOG_FILE);
+    public static void deleteLog() {
+        try {
+            Files.deleteIfExists(LOG_FILE);
+        } catch (IOException e) {
+            throw new CustomIOException(e);
+        }
     }
 
     @Test
@@ -48,15 +53,19 @@ public class FileLoggerTest implements Loggable {
     }
 
     @Test
-    public void create() throws IOException {
-        Files.deleteIfExists(LOG_FILE);
+    public void create() {
+        try {
+            Files.deleteIfExists(LOG_FILE);
+        } catch (IOException e) {
+            throw new CustomIOException(e);
+        }
         assertFalse(Files.exists(LOG_FILE));
         FILE_LOGGER.create();
         assertTrue(Files.exists(LOG_FILE));
     }
 
     @Test
-    public void create_AlreadyExists() throws IOException {
+    public void create_AlreadyExists() {
         FILE_LOGGER.create();
         writeLine();
         String loggedString = readLine();
@@ -65,26 +74,29 @@ public class FileLoggerTest implements Loggable {
         assertNull(readLine());
     }
 
-    private void writeLine() throws IOException {
-        Writer logWriter = new FileWriter(FILE_LOGGER.getFileName());
-        logWriter.write("12345");
-        logWriter.close();
+    private void writeLine() {
+        try (Writer logWriter = new FileWriter(FILE_LOGGER.getFileName())) {
+            logWriter.write("12345");
+        } catch (IOException e) {
+            throw new CustomIOException(e);
+        }
     }
 
-    private String readLine() throws IOException {
-        BufferedReader logReader = new BufferedReader(new FileReader(FILE_LOGGER.getFileName()));
-        String loggedString = logReader.readLine();
-        logReader.close();
-        return loggedString;
+    private String readLine() {
+        try (BufferedReader logReader = new BufferedReader(new FileReader(FILE_LOGGER.getFileName()))) {
+            return logReader.readLine();
+        } catch (IOException e) {
+            throw new CustomIOException(e);
+        }
     }
 
     @Test
-    public void log() throws IOException {
+    public void log() {
         logMessage();
         assertNotNull(readLine());
     }
 
-    private void logMessage() throws IOException {
+    private void logMessage() {
         FILE_LOGGER.log(this, MESSAGE);
     }
 
@@ -95,29 +107,31 @@ public class FileLoggerTest implements Loggable {
     }
 
     @Test
-    public void log_MultipleMessages() throws IOException {
+    public void log_MultipleMessages() {
         logMessage();
         logMessage();
         logMessage();
         assertEquals(3, getMessagesCount());
     }
 
-    private int getMessagesCount() throws IOException {
+    private int getMessagesCount() {
         return readAllLines().size();
     }
 
-    private List<String> readAllLines() throws IOException {
-        ArrayList<String> lines = new ArrayList<>();
-        BufferedReader logReader = new BufferedReader(new FileReader(FILE_LOGGER.getFileName()));
-        while (logReader.ready()) {
-            lines.add(logReader.readLine());
+    private List<String> readAllLines() {
+        try (BufferedReader logReader = new BufferedReader(new FileReader(FILE_LOGGER.getFileName()))) {
+            ArrayList<String> lines = new ArrayList<>();
+            while (logReader.ready()) {
+                lines.add(logReader.readLine());
+            }
+            return lines;
+        } catch (IOException e) {
+            throw new CustomIOException(e);
         }
-        logReader.close();
-        return lines;
     }
 
     @Test
-    public void log_CorrectData() throws IOException {
+    public void log_CorrectData() {
         logMessage();
         LocalTime now = LocalTime.now();
         assertEquals(String.format("<%-25s> [%02d:%02d:%02d]: %s",

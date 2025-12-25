@@ -1,5 +1,6 @@
 package ru.yandex.practicum.log;
 
+import ru.yandex.practicum.exceptions.CustomIOException;
 import ru.yandex.practicum.log.exceptions.LogFileNotFoundException;
 
 import java.io.FileWriter;
@@ -21,7 +22,7 @@ public class FileLogger implements Logger {
     }
 
     @Override
-    public void log(Loggable sender, String message) throws IOException, LogFileNotFoundException {
+    public void log(Loggable sender, String message) {
         if (file == null) {
             throw new LogFileNotFoundException(this);
         }
@@ -34,9 +35,11 @@ public class FileLogger implements Logger {
                 sender.getSenderName(), time.getHour(), time.getMinute(), time.getSecond(), message);
     }
 
-    private void writeMessage(String message) throws IOException {
+    private void writeMessage(String message) {
         try (Writer logWriter = new FileWriter(file.toFile(), true)) {
             logWriter.write(message);
+        } catch (IOException e) {
+            throw new CustomIOException(e);
         }
     }
 
@@ -44,9 +47,13 @@ public class FileLogger implements Logger {
         return fileName;
     }
 
-    public void create() throws IOException {
-        file = Paths.get(fileName);
-        Files.deleteIfExists(file);
-        Files.createFile(file);
+    public void create() {
+        try {
+            file = Paths.get(fileName);
+            Files.deleteIfExists(file);
+            Files.createFile(file);
+        } catch (IOException e) {
+            throw new CustomIOException(e);
+        }
     }
 }

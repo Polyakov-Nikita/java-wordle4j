@@ -3,14 +3,11 @@ package ru.yandex.practicum;
 import ru.yandex.practicum.dictionary.WordleDictionary;
 import ru.yandex.practicum.dictionary.exceptions.WordIsAbsentException;
 import ru.yandex.practicum.game.WordleGame;
-import ru.yandex.practicum.game.exceptions.GameOverException;
 import ru.yandex.practicum.game.exceptions.IncorrectWordException;
-import ru.yandex.practicum.game.exceptions.VictoryException;
 import ru.yandex.practicum.game.exceptions.WordRepeatingException;
 import ru.yandex.practicum.log.FileLogger;
 import ru.yandex.practicum.log.Logger;
 
-import java.io.IOException;
 import java.util.Scanner;
 
 /*
@@ -39,7 +36,7 @@ public class Wordle {
         }
     }
 
-    private static void initialize() throws IOException {
+    private static void initialize() {
         Logger logger = createLogger();
         WordleDictionaryLoader loader = createLoader(logger);
         WordleDictionary wordleDictionary = loader.load();
@@ -48,7 +45,7 @@ public class Wordle {
         scanner = new Scanner(System.in);
     }
 
-    private static Logger createLogger() throws IOException {
+    private static Logger createLogger() {
         FileLogger fileLogger = new FileLogger(LOG_NAME);
         fileLogger.create();
         return fileLogger;
@@ -60,7 +57,7 @@ public class Wordle {
         return loader;
     }
 
-    private static void startGame() throws IOException {
+    private static void startGame() {
         System.out.println("Игра началась");
         game.start();
         printTurn(game.getSteps());
@@ -70,14 +67,21 @@ public class Wordle {
         System.out.printf("Ход %d%n", turn);
     }
 
-    private static void gameCycle() throws IOException {
-        boolean isExit = false;
-        while (!isExit) {
+    private static void gameCycle() {
+        while (true) {
+            if (game.isGameOver()) {
+                System.out.println("Попытки закончились. Вы проиграли.");
+                break;
+            }
             String input = takeInput();
             if (input.isEmpty()) {
                 input = showHint();
             }
-            isExit = analyseInput(input);
+            if (game.isAnswer(input)) {
+                System.out.println("Победа!");
+                break;
+            }
+            analyseInput(input);
         }
     }
 
@@ -86,13 +90,13 @@ public class Wordle {
         return scanner.nextLine();
     }
 
-    private static String showHint() throws IOException {
+    private static String showHint() {
         String hint = game.giveHint();
         System.out.printf("Подсказка: %s%n", hint);
         return hint;
     }
 
-    private static boolean analyseInput(String input) throws IOException {
+    private static void analyseInput(String input) {
         String analysis;
         try {
             analysis = game.analyseWord(input);
@@ -100,17 +104,10 @@ public class Wordle {
             printTurn(game.getSteps());
         } catch (IncorrectWordException e) {
             System.out.println("Некорректный ввод.");
-        } catch (VictoryException e) {
-            System.out.println("Победа!");
-            return true;
         } catch (WordIsAbsentException e) {
             System.out.println("Такого слова я не знаю.");
         } catch (WordRepeatingException e) {
             System.out.println("Такое слово уже было!");
-        } catch (GameOverException e) {
-            System.out.println("Попытки закончились. Вы проиграли.");
-            return true;
         }
-        return false;
     }
 }

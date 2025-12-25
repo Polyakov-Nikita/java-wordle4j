@@ -1,13 +1,7 @@
 package ru.yandex.practicum.dictionary;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 public class FiveCharsChecker implements WordsChecker {
     public static final int CORRECT_WORD_LENGTH = 5;
-
-    private static final Set<Character> notSupportedSymbols = new HashSet<>(List.of(' ', '-'));
 
     @Override
     public boolean checkWord(String word) {

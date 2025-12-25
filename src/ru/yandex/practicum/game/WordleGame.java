@@ -2,14 +2,11 @@ package ru.yandex.practicum.game;
 
 import ru.yandex.practicum.dictionary.WordleDictionary;
 import ru.yandex.practicum.dictionary.exceptions.WordIsAbsentException;
-import ru.yandex.practicum.game.exceptions.GameOverException;
 import ru.yandex.practicum.game.exceptions.IncorrectWordException;
-import ru.yandex.practicum.game.exceptions.VictoryException;
 import ru.yandex.practicum.game.exceptions.WordRepeatingException;
 import ru.yandex.practicum.log.Loggable;
 import ru.yandex.practicum.log.Logger;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -59,7 +56,7 @@ public class WordleGame implements Loggable {
         return answer;
     }
 
-    private void setSteps(int steps) throws IOException {
+    private void setSteps(int steps) {
         this.steps = steps;
         logger.log(this, String.format("Количество шагов теперь равно '%d'.", steps));
     }
@@ -68,23 +65,20 @@ public class WordleGame implements Loggable {
         return steps;
     }
 
-    public void start() throws IOException {
+    public void start() {
         logger.log(this, "Игра началась.");
         answer = dictionary.getRandomWord();
         logger.log(this, String.format("Задумано слово '%s'.", answer));
         setSteps(1);
     }
 
-    public String analyseWord(String word)
-            throws IOException, WordIsAbsentException, WordRepeatingException, GameOverException {
+    public String analyseWord(String word) {
         word = dictionary.normalizeWord(word);
         checkCorrectness(word);
         logger.log(this, String.format("Получено слово '%s'.", word));
-        checkVictory(word);
         checkContains(word);
         checkExcluded(word);
         setSteps(steps + 1);
-        checkGameOver();
         dictionary.excludeWord(word);
         String analysis = analyseWordLetters(word);
         logger.log(this, String.format("Анализ слова: %s.", analysis));
@@ -92,38 +86,24 @@ public class WordleGame implements Loggable {
         return analysis;
     }
 
-    private void checkCorrectness(String word) throws IOException, IncorrectWordException {
+    private void checkCorrectness(String word) {
         if (!dictionary.checkWord(word)) {
             logger.log(this, "Слово %s некорректно.");
             throw new IncorrectWordException(word);
         }
     }
 
-    private void checkVictory(String word) throws IOException {
-        if (answer.equals(word)) {
-            logger.log(this, "Слово совпало с загаданным.");
-            throw new VictoryException(steps);
-        }
-    }
-
-    private void checkContains(String word) throws IOException, WordIsAbsentException {
+    private void checkContains(String word) {
         if (!dictionary.containsWord(word)) {
             logger.log(this, "Слово не найдено.");
             throw new WordIsAbsentException();
         }
     }
 
-    private void checkExcluded(String word) throws IOException, WordRepeatingException {
+    private void checkExcluded(String word) {
         if (dictionary.isExcludedWord(word)) {
             logger.log(this, "Такое слово уже было.");
             throw new WordRepeatingException();
-        }
-    }
-
-    private void checkGameOver() throws IOException, GameOverException {
-        if (steps > ATTEMPTS_COUNT) {
-            logger.log(this, "Попытки закончились.");
-            throw new GameOverException();
         }
     }
 
@@ -147,7 +127,7 @@ public class WordleGame implements Loggable {
         return OTHER_POSITION;
     }
 
-    private void updateDictionary(String word, String analysis) throws IOException {
+    private void updateDictionary(String word, String analysis) {
         int wordLength = word.length();
         Set<Character> absentLetters = new HashSet<>();
         Set<Character> rightLetters = new HashSet<>();
@@ -162,7 +142,7 @@ public class WordleGame implements Loggable {
         removeWithoutRight(rightLetters);
     }
 
-    private void removeWithAbsent(Set<Character> absentLetters) throws IOException {
+    private void removeWithAbsent(Set<Character> absentLetters) {
         absentLetters.removeAll(forbiddenLetters);
         if (!absentLetters.isEmpty()) {
             dictionary.removeWithLetters(absentLetters);
@@ -170,7 +150,7 @@ public class WordleGame implements Loggable {
         }
     }
 
-    private void removeWithoutRight(Set<Character> rightLetters) throws IOException {
+    private void removeWithoutRight(Set<Character> rightLetters) {
         rightLetters.removeAll(requiredLetters);
         if (!rightLetters.isEmpty()) {
             dictionary.removeWithoutLetters(rightLetters);
@@ -178,9 +158,17 @@ public class WordleGame implements Loggable {
         }
     }
 
-    public String giveHint() throws IOException {
+    public String giveHint() {
         String hint = dictionary.getRandomWord();
         logger.log(this, String.format("Дана подсказка: '%s'.", hint));
         return hint;
+    }
+
+    public boolean isGameOver() {
+        return steps > ATTEMPTS_COUNT;
+    }
+
+    public boolean isAnswer(String word) {
+        return answer.equals(word);
     }
 }

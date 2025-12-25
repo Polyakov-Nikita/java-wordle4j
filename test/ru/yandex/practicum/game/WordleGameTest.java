@@ -6,12 +6,9 @@ import ru.yandex.practicum.dictionary.FiveCharsChecker;
 import ru.yandex.practicum.dictionary.UpperENormalizer;
 import ru.yandex.practicum.dictionary.WordleDictionary;
 import ru.yandex.practicum.dictionary.exceptions.WordIsAbsentException;
-import ru.yandex.practicum.game.exceptions.GameOverException;
 import ru.yandex.practicum.game.exceptions.IncorrectWordException;
-import ru.yandex.practicum.game.exceptions.VictoryException;
 import ru.yandex.practicum.game.exceptions.WordRepeatingException;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -46,7 +43,7 @@ public class WordleGameTest {
 
 
     @Test
-    public void start_createAnswer() throws IOException {
+    public void start_createAnswer() {
         WordleDictionary dictionary = createDictionaryWithAnswer(ANSWER);
         WordleGame game = createGame(dictionary);
         game.start();
@@ -67,7 +64,7 @@ public class WordleGameTest {
     }
 
     @Test
-    public void start_SetStepsToOne() throws IOException {
+    public void start_SetStepsToOne() {
         WordleDictionary dictionary = createDictionaryWithAnswer(ANSWER);
         WordleGame game = createGame(dictionary);
         game.start();
@@ -75,7 +72,7 @@ public class WordleGameTest {
     }
 
     @Test
-    public void analyseWord() throws IOException {
+    public void analyseWord() {
         WordleDictionary dictionary = createDictionaryWithAnswer(ANSWER);
         WordleGame game = createGame(dictionary);
         game.start();
@@ -84,7 +81,7 @@ public class WordleGameTest {
     }
 
     @Test
-    public void analyseWord_NeedToNormalize() throws IOException {
+    public void analyseWord_NeedToNormalize() {
         WordleDictionary dictionary = createDictionaryWithAnswer(ANSWER);
         WordleGame game = createGame(dictionary);
         game.start();
@@ -93,7 +90,7 @@ public class WordleGameTest {
     }
 
     @Test
-    public void analyseWord_IncorrectWord() throws IOException {
+    public void analyseWord_IncorrectWord() {
         WordleDictionary dictionary = createDictionaryWithAnswer(ANSWER);
         WordleGame game = createGame(dictionary);
         game.start();
@@ -101,7 +98,7 @@ public class WordleGameTest {
     }
 
     @Test
-    public void analyseWord_IncorrectWord_Word() throws IOException {
+    public void analyseWord_IncorrectWord_Word() {
         WordleDictionary dictionary = createDictionaryWithAnswer(ANSWER);
         WordleGame game = createGame(dictionary);
         game.start();
@@ -117,7 +114,7 @@ public class WordleGameTest {
     }
 
     @Test
-    public void analyseWord_WordWithEqualLetters() throws IOException {
+    public void analyseWord_WordWithEqualLetters() {
         WordleDictionary dictionary = createDictionaryWithAnswer(ANSWER_WITH_EQUAL_LETTERS);
         WordleGame game = createGame(dictionary);
         game.start();
@@ -126,7 +123,7 @@ public class WordleGameTest {
     }
 
     @Test
-    public void analyseWord_WordIsAbsentInDictionary() throws IOException {
+    public void analyseWord_WordIsAbsentInDictionary() {
         WordleDictionary dictionary = createDictionaryWithAnswer(ANSWER);
         WordleGame game = createGame(dictionary);
         game.start();
@@ -134,7 +131,7 @@ public class WordleGameTest {
     }
 
     @Test
-    public void analyseWord_WordRepeating() throws IOException {
+    public void analyseWord_WordRepeating() {
         WordleDictionary dictionary = createDictionaryWithAnswer(ANSWER);
         WordleGame game = createGame(dictionary);
         game.start();
@@ -144,7 +141,7 @@ public class WordleGameTest {
     }
 
     @Test
-    public void analyseWord_StepsIncreasing_Increase_CorrectAttempt() throws IOException {
+    public void analyseWord_StepsIncreasing_Increase_CorrectAttempt() {
         WordleDictionary dictionary = createDictionaryWithAnswer(ANSWER);
         WordleGame game = createGame(dictionary);
         game.start();
@@ -154,7 +151,7 @@ public class WordleGameTest {
     }
 
     @Test
-    public void analyseWord_StepsIncreasing_NotIncrease_IncorrectAttempt() throws IOException {
+    public void analyseWord_StepsIncreasing_NotIncrease_IncorrectAttempt() {
         WordleDictionary dictionary = createDictionaryWithAnswer(ANSWER);
         WordleGame game = createGame(dictionary);
         game.start();
@@ -163,7 +160,7 @@ public class WordleGameTest {
     }
 
     @Test
-    public void analyseWord_StepsIncreasing_NotIncrease_RepeatingWord() throws IOException {
+    public void analyseWord_StepsIncreasing_NotIncrease_RepeatingWord() {
         WordleDictionary dictionary = createDictionaryWithAnswer(ANSWER);
         WordleGame game = createGame(dictionary);
         game.start();
@@ -171,20 +168,6 @@ public class WordleGameTest {
         game.analyseWord(WORD_1);
         assertThrows(WordRepeatingException.class, () -> game.analyseWord(WORD_1));
         assertEquals(2, game.getSteps());
-    }
-
-    @Test
-    public void analyseWord_GameOver() throws IOException {
-        WordleDictionary dictionary = createDictionaryWithAnswer(ANSWER);
-        WordleGame game = createGame(dictionary);
-        game.start();
-        addOtherWords(dictionary);
-        game.analyseWord(WORD_1);
-        game.analyseWord(WORD_2);
-        game.analyseWord(WORD_3);
-        game.analyseWord(WORD_4);
-        game.analyseWord(WORD_5);
-        assertThrows(GameOverException.class, () -> game.analyseWord(WORD_6));
     }
 
     private void addOtherWords(WordleDictionary dictionary) {
@@ -194,42 +177,28 @@ public class WordleGameTest {
     }
 
     @Test
-    public void analyseWord_Victory() throws IOException {
+    public void giveHint() {
+        WordleDictionary dictionary = createDictionaryWithAnswer(ANSWER);
+        WordleGame game = createGame(dictionary);
+        game.start();
+        addOtherWords(dictionary);
+        assertTrue(ALL_WORDS.contains(game.giveHint()));
+    }
+
+    @Test
+    public void isGameOver_False() {
         WordleDictionary dictionary = createDictionaryWithAnswer(ANSWER);
         WordleGame game = createGame(dictionary);
         game.start();
         addOtherWords(dictionary);
         game.analyseWord(WORD_1);
         game.analyseWord(WORD_2);
-        assertThrows(VictoryException.class, () -> game.analyseWord(ANSWER));
+        game.analyseWord(WORD_3);
+        assertFalse(game.isGameOver());
     }
 
     @Test
-    public void analyseWord_Victory_Step() throws IOException {
-        WordleDictionary dictionary = createDictionaryWithAnswer(ANSWER);
-        WordleGame game = createGame(dictionary);
-        game.start();
-        addOtherWords(dictionary);
-        game.analyseWord(WORD_1);
-        game.analyseWord(WORD_2);
-        try {
-            game.analyseWord(ANSWER);
-        } catch (VictoryException e) {
-            assertEquals(3, e.getStep());
-        }
-    }
-
-    @Test
-    public void analyseWord_Victory_FirstTurn() throws IOException {
-        WordleDictionary dictionary = createDictionaryWithAnswer(ANSWER);
-        WordleGame game = createGame(dictionary);
-        game.start();
-        addOtherWords(dictionary);
-        assertThrows(VictoryException.class, () -> game.analyseWord(ANSWER));
-    }
-
-    @Test
-    public void analyseWord_Victory_LastTurn() throws IOException {
+    public void isGameOver_True() {
         WordleDictionary dictionary = createDictionaryWithAnswer(ANSWER);
         WordleGame game = createGame(dictionary);
         game.start();
@@ -239,15 +208,25 @@ public class WordleGameTest {
         game.analyseWord(WORD_3);
         game.analyseWord(WORD_4);
         game.analyseWord(WORD_5);
-        assertThrows(VictoryException.class, () -> game.analyseWord(ANSWER));
+        game.analyseWord(WORD_6);
+        assertTrue(game.isGameOver());
     }
 
     @Test
-    public void giveHint() throws IOException {
+    public void isAnswer_False() {
         WordleDictionary dictionary = createDictionaryWithAnswer(ANSWER);
         WordleGame game = createGame(dictionary);
         game.start();
         addOtherWords(dictionary);
-        assertTrue(ALL_WORDS.contains(game.giveHint()));
+        assertFalse(game.isAnswer(WORD_1));
+    }
+
+    @Test
+    public void isAnswer_True() {
+        WordleDictionary dictionary = createDictionaryWithAnswer(ANSWER);
+        WordleGame game = createGame(dictionary);
+        game.start();
+        addOtherWords(dictionary);
+        assertTrue(game.isAnswer(ANSWER));
     }
 }

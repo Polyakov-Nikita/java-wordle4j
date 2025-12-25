@@ -8,7 +8,6 @@ import ru.yandex.practicum.dictionary.exceptions.EmptyDictionaryException;
 import ru.yandex.practicum.dictionary.exceptions.WordAlreadyExcludedException;
 import ru.yandex.practicum.dictionary.exceptions.WordIsAbsentException;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -71,13 +70,13 @@ public class WordleDictionaryTest {
     }
 
     @Test
-    public void getRandomWord() throws IOException {
+    public void getRandomWord() {
         addAllWords();
         assertTrue(ALL_WORDS.contains(dictionary.getRandomWord()));
     }
 
     @Test
-    public void getRandomWord_EmptyAllowedWords() throws IOException {
+    public void getRandomWord_EmptyAllowedWords() {
         addAllWords();
         int allWordsCount = ALL_WORDS.size();
         for (int i = 0; i < allWordsCount; i++) {
@@ -93,7 +92,7 @@ public class WordleDictionaryTest {
     }
 
     @Test
-    public void getRandomWord_WithoutExcluded() throws IOException {
+    public void getRandomWord_WithoutExcluded() {
         addAllWords();
         Set<String> excludedWords = new HashSet<>(List.of(WORD_2, WORD_3));
         dictionary.excludeWord(WORD_2);
@@ -101,7 +100,7 @@ public class WordleDictionaryTest {
         assertNotContainsAllRandoms(excludedWords);
     }
 
-    private void assertNotContainsAllRandoms(Set<String> set) throws IOException {
+    private void assertNotContainsAllRandoms(Set<String> set) {
         for (int i = 0; i < 10; i++) {
             assertFalse(set.contains(dictionary.getRandomWord()));
         }
@@ -113,7 +112,7 @@ public class WordleDictionaryTest {
     }
 
     @Test
-    public void excludeWord() throws IOException {
+    public void excludeWord() {
         addAllWords();
         dictionary.excludeWord(WORD_1);
         assertTrue(dictionary.isExcludedWord(WORD_1));
@@ -126,14 +125,14 @@ public class WordleDictionaryTest {
     }
 
     @Test
-    public void excludeWord_ExcludedWord() throws IOException {
+    public void excludeWord_ExcludedWord() {
         addAllWords();
         dictionary.excludeWord(WORD_1);
         assertThrows(WordAlreadyExcludedException.class, () -> dictionary.excludeWord(WORD_1));
     }
 
     @Test
-    public void excludeWord_ExcludedWord_CorrectWord() throws IOException {
+    public void excludeWord_ExcludedWord_CorrectWord() {
         addAllWords();
         dictionary.excludeWord(WORD_1);
         try {
@@ -144,7 +143,7 @@ public class WordleDictionaryTest {
     }
 
     @Test
-    public void removeWithoutLetters() throws IOException {
+    public void removeWithoutLetters() {
         addAllWords();
         Set<String> excludedWords = new HashSet<>(List.of(WORD_1, WORD_2));
         dictionary.removeWithoutLetters(LETTERS_FROM_WORD_3);
@@ -152,7 +151,7 @@ public class WordleDictionaryTest {
     }
 
     @Test
-    public void removeWithLetters() throws IOException {
+    public void removeWithLetters() {
         addAllWords();
         Set<String> excludedWords = new HashSet<>(List.of(WORD_3));
         dictionary.removeWithLetters(LETTERS_FROM_WORD_3);

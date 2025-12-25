@@ -7,7 +7,6 @@ import ru.yandex.practicum.dictionary.exceptions.WordIsAbsentException;
 import ru.yandex.practicum.log.Loggable;
 import ru.yandex.practicum.log.Logger;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -71,7 +70,7 @@ public class WordleDictionary implements Loggable {
         return words.contains(word);
     }
 
-    public String getRandomWord() throws IOException, EmptyDictionaryException, EmptyAllowedWordsException {
+    public String getRandomWord() {
         checkEmptiness();
         checkAllowed();
         String word = getRandomWord(getRandomIndexList());
@@ -79,13 +78,13 @@ public class WordleDictionary implements Loggable {
         return word;
     }
 
-    private void checkEmptiness() throws EmptyDictionaryException {
+    private void checkEmptiness() {
         if (words.isEmpty()) {
             throw new EmptyDictionaryException();
         }
     }
 
-    private void checkAllowed() throws EmptyAllowedWordsException {
+    private void checkAllowed() {
         if (masksIndexes.isEmpty()) {
             throw new EmptyAllowedWordsException();
         }
@@ -104,7 +103,7 @@ public class WordleDictionary implements Loggable {
         return words.get(wordIndex);
     }
 
-    public void excludeWord(String word) throws IOException, WordIsAbsentException, WordAlreadyExcludedException {
+    public void excludeWord(String word) {
         checkAbsent(word);
         checkExcluded(word);
         int wordIndex = words.indexOf(word);
@@ -113,13 +112,13 @@ public class WordleDictionary implements Loggable {
         logger.log(this, String.format("Слово '%s' исключено из списка возможных.", word));
     }
 
-    private void checkAbsent(String word) throws WordIsAbsentException {
+    private void checkAbsent(String word) {
         if (!words.contains(word)) {
             throw new WordIsAbsentException();
         }
     }
 
-    private void checkExcluded(String word) throws WordAlreadyExcludedException {
+    private void checkExcluded(String word) {
         if (excludedIndexes.contains(words.indexOf(word))) {
             throw new WordAlreadyExcludedException(word);
         }
@@ -141,7 +140,7 @@ public class WordleDictionary implements Loggable {
         return excludedIndexes.contains(words.indexOf(word));
     }
 
-    public void removeWithoutLetters(Set<Character> requiredLetters) throws IOException {
+    public void removeWithoutLetters(Set<Character> requiredLetters) {
         int requiredMask = createMask(requiredLetters);
         Set<Integer> indexesToRemove = getIndexesToRemove((wordMask) -> (wordMask & requiredMask) != requiredMask);
         removeAllFromAllowed(indexesToRemove);
@@ -178,7 +177,7 @@ public class WordleDictionary implements Loggable {
         return wordBuilder.toString();
     }
 
-    public void removeWithLetters(Set<Character> forbiddenLetters) throws IOException {
+    public void removeWithLetters(Set<Character> forbiddenLetters) {
         List<Integer> forbiddenMasks = createForbiddenMasks(forbiddenLetters);
         Set<Integer> indexesToRemove = getIndexesToRemove((wordMask) -> {
             for (int mask : forbiddenMasks) {
