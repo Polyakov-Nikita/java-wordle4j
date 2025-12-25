@@ -44,7 +44,7 @@ public class FileLoggerTest implements Loggable {
 
     @Test
     public void constructor() {
-        assertEquals(LOG_FILE_NAME + "." + FILE_LOGGER.FILE_EXTENSION, FILE_LOGGER.getFileName());
+        assertEquals(LOG_FILE_NAME + "." + FileLogger.FILE_EXTENSION, FILE_LOGGER.getFileName());
     }
 
     @Test

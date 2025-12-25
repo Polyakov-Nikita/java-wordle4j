@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 import java.time.LocalTime;
 
 public class FileLogger implements Logger {
-    public final String FILE_EXTENSION = "log";
+    public static final String FILE_EXTENSION = "log";
 
     private final String fileName;
     private Path file;
